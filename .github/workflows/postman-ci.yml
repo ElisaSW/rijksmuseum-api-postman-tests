@@ -23,7 +23,6 @@ jobs:
       - name: Replace API key in environment file
         run: |
           jq '.values[] |= if .key == "apiKey" then .value=env.API_KEY else . end' Rijksmuseum.postman_environment.json > tmp.json
-          cat tmp.json
           mv tmp.json Rijksmuseum.postman_environment.json
 
       - name: Run Postman tests
