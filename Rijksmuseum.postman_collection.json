@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Rijksmuseum API Tests",
+    "_postman_id": "d4b1baf1-9027-4b09-a93a-rijks-id",
+    "description": "Test suite for Rijksmuseum public API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Collection",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection?key={{apiKey}}&format=json",
+          "host": ["https://www.rijksmuseum.nl"],
+          "path": ["api", "en", "collection"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            { "key": "format", "value": "json" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Contains artObjects\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData).to.have.property(\"artObjects\");",
+              "  pm.expect(jsonData.artObjects.length).to.be.above(0);",
+              "  pm.collectionVariables.set(\"objectNumber\", jsonData.artObjects[0].objectNumber);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Collection - By Artist (Rembrandt)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection?key={{apiKey}}&involvedMaker=Rembrandt&format=json",
+          "host": ["https://www.rijksmuseum.nl"],
+          "path": ["api", "en", "collection"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            { "key": "involvedMaker", "value": "Rembrandt" },
+            { "key": "format", "value": "json" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test(\"All objects are by Rembrandt\", () => {",
+              "  data.artObjects.forEach(obj => pm.expect(obj.principalOrFirstMaker).to.include(\"Rembrandt\"));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Object Details",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection/{{objectNumber}}?key={{apiKey}}&format=json",
+          "host": ["https://www.rijksmuseum.nl"],
+          "path": ["api", "en", "collection", "{{objectNumber}}"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            { "key": "format", "value": "json" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const obj = pm.response.json().artObject;",
+              "pm.test(\"Object has title and ID\", () => {",
+              "  pm.expect(obj).to.have.property(\"title\");",
+              "  pm.expect(obj).to.have.property(\"objectNumber\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid API Key",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection?key=INVALID&format=json",
+          "host": ["https://www.rijksmuseum.nl"],
+          "path": ["api", "en", "collection"],
+          "query": [
+            { "key": "key", "value": "INVALID" },
+            { "key": "format", "value": "json" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Should return 403 or 401\", () => {",
+              "  pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid Object Number",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection/INVALID_ID?key={{apiKey}}&format=json",
+          "host": ["https://www.rijksmuseum.nl"],
+          "path": ["api", "en", "collection", "INVALID_ID"],
+          "query": [
+            { "key": "key", "value": "{{apiKey}}" },
+            { "key": "format", "value": "json" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();",
+              "pm.test(\"Handles error or empty result\", () => {",
+              "  pm.expect(pm.response.code).to.be.oneOf([404, 200]);",
+              "  if (res.artObject) pm.expect(res.artObject.title).to.not.exist;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": []
+}
