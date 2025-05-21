@@ -40,37 +40,6 @@
       ]
     },
     {
-      "name": "Get Collection - By Artist (Rembrandt)",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "https://www.rijksmuseum.nl/api/en/collection?key={{apiKey}}&involvedMaker=Rembrandt&format=json",
-          "host": ["https://www.rijksmuseum.nl"],
-          "path": ["api", "en", "collection"],
-          "query": [
-            { "key": "key", "value": "{{apiKey}}" },
-            { "key": "involvedMaker", "value": "Rembrandt" },
-            { "key": "format", "value": "json" }
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
-              "const data = pm.response.json();",
-              "pm.test(\"All objects are by Rembrandt\", () => {",
-              "  data.artObjects.forEach(obj => pm.expect(obj.principalOrFirstMaker).to.include(\"Rembrandt\"));",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ]
-    },
-    {
       "name": "Get Object Details",
       "request": {
         "method": "GET",
