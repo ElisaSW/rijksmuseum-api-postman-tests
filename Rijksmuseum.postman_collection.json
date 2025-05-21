@@ -8,19 +8,6 @@
   "item": [
     {
       "name": "Get Collection",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "https://www.rijksmuseum.nl/api/en/collection?key={{apiKey}}&format=json",
-          "host": ["https://www.rijksmuseum.nl"],
-          "path": ["api", "en", "collection"],
-          "query": [
-            { "key": "key", "value": "{{apiKey}}" },
-            { "key": "format", "value": "json" }
-          ]
-        }
-      },
       "event": [
         {
           "listen": "test",
@@ -37,22 +24,139 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "Invalid API Key",
+      ],
       "request": {
         "method": "GET",
+        "header": [],
         "url": {
-          "raw": "https://www.rijksmuseum.nl/api/en/collection?key=INVALID&format=json",
-          "host": ["https://www.rijksmuseum.nl"],
-          "path": ["api", "en", "collection"],
+          "raw": "https://www.rijksmuseum.nl/api/en/collection?key={{apiKey}}&format=json",
+          "protocol": "https",
+          "host": [
+            "www",
+            "rijksmuseum",
+            "nl"
+          ],
+          "path": [
+            "api",
+            "en",
+            "collection"
+          ],
           "query": [
-            { "key": "key", "value": "INVALID" },
-            { "key": "format", "value": "json" }
+            {
+              "key": "key",
+              "value": "{{apiKey}}"
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
           ]
         }
       },
+      "response": []
+    },
+    {
+      "name": "Get Collection - By Artist (Rembrandt)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const jsonData = pm.response.json();",
+              "pm.test(\"All objects are by Rembrandt\", () => {",
+              "  jsonData.artObjects.forEach(obj => pm.expect(obj.principalOrFirstMaker).to.include(\"Rembrandt\"));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection?key={{apiKey}}&involvedMaker=Rembrandt&format=json",
+          "protocol": "https",
+          "host": [
+            "www",
+            "rijksmuseum",
+            "nl"
+          ],
+          "path": [
+            "api",
+            "en",
+            "collection"
+          ],
+          "query": [
+            {
+              "key": "key",
+              "value": "{{apiKey}}"
+            },
+            {
+              "key": "involvedMaker",
+              "value": "Rembrandt"
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Object Details",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const obj = pm.response.json().artObject;",
+              "pm.test(\"Object has title and ID\", () => {",
+              "  pm.expect(obj).to.have.property(\"title\");",
+              "  pm.expect(obj).to.have.property(\"objectNumber\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection/{{objectNumber}}?key={{apiKey}}&format=json",
+          "protocol": "https",
+          "host": [
+            "www",
+            "rijksmuseum",
+            "nl"
+          ],
+          "path": [
+            "api",
+            "en",
+            "collection",
+            "{{objectNumber}}"
+          ],
+          "query": [
+            {
+              "key": "key",
+              "value": "{{apiKey}}"
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid API Key",
       "event": [
         {
           "listen": "test",
@@ -65,22 +169,39 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "Invalid Object Number",
+      ],
       "request": {
         "method": "GET",
+        "header": [],
         "url": {
-          "raw": "https://www.rijksmuseum.nl/api/en/collection/INVALID_ID?key={{apiKey}}&format=json",
-          "host": ["https://www.rijksmuseum.nl"],
-          "path": ["api", "en", "collection", "INVALID_ID"],
+          "raw": "https://www.rijksmuseum.nl/api/en/collection?key=INVALID&format=json",
+          "protocol": "https",
+          "host": [
+            "www",
+            "rijksmuseum",
+            "nl"
+          ],
+          "path": [
+            "api",
+            "en",
+            "collection"
+          ],
           "query": [
-            { "key": "key", "value": "{{apiKey}}" },
-            { "key": "format", "value": "json" }
+            {
+              "key": "key",
+              "value": "INVALID"
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
           ]
         }
       },
+      "response": []
+    },
+    {
+      "name": "Invalid Object Number",
       "event": [
         {
           "listen": "test",
@@ -92,10 +213,41 @@
               "  if (res.artObject) pm.expect(res.artObject.title).to.not.exist;",
               "});"
             ],
-            "type": "text/javascript"
+            "type": "text/javascript",
+            "packages": {}
           }
         }
-      ]
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://www.rijksmuseum.nl/api/en/collection/INVALID_ID?key={{apiKey}}&format=json",
+          "protocol": "https",
+          "host": [
+            "www",
+            "rijksmuseum",
+            "nl"
+          ],
+          "path": [
+            "api",
+            "en",
+            "collection",
+            "INVALID_ID"
+          ],
+          "query": [
+            {
+              "key": "key",
+              "value": "{{apiKey}}"
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": []
