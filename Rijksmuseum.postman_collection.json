@@ -40,37 +40,6 @@
       ]
     },
     {
-      "name": "Get Object Details",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "https://www.rijksmuseum.nl/api/en/collection/{{objectNumber}}?key={{apiKey}}&format=json",
-          "host": ["https://www.rijksmuseum.nl"],
-          "path": ["api", "en", "collection", "{{objectNumber}}"],
-          "query": [
-            { "key": "key", "value": "{{apiKey}}" },
-            { "key": "format", "value": "json" }
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
-              "const obj = pm.response.json().artObject;",
-              "pm.test(\"Object has title and ID\", () => {",
-              "  pm.expect(obj).to.have.property(\"title\");",
-              "  pm.expect(obj).to.have.property(\"objectNumber\");",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ]
-    },
-    {
       "name": "Invalid API Key",
       "request": {
         "method": "GET",
